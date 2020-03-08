@@ -5,15 +5,27 @@ section .text
 global _start
 
 _start:         
-                mov rdl, 1ah
+                mov dl, 0x1a
                 call ByteToHex
-                mov rax, 0x01              ; write
-                mov rdi, 1              ; stdout
-                mov rsi, rdx
-                mov rdx, 1              ; strlen(rsi)
+                mov rax, 0x01                           ; write
+                mov rdi, 1                              ; stdout
+                mov rsi, r8
+                mov rdx, 1                              ; rdx = strlen(rsi)
+                syscall
+                mov rsi, r9
                 syscall
 
-                mov rax, 0x3C           ;exit(rdi)
+                mov dl, 0xF0
+                call ByteToHex
+                mov rax, 0x01                           ; write
+                mov rdi, 1                              ; stdout
+                mov rsi, r8
+                mov rdx, 1                              ; rdx = strlen(rsi)
+                syscall
+                mov rsi, r9
+                syscall
+
+                mov rax, 0x3C                           ;exit(rdi)
                 xor rdi, rdi
                 syscall
 
@@ -21,29 +33,31 @@ _start:
 ;====================================================================
 ;Translates byte into its ASCII HEX interpretation.
 ;--------------------------------------------------------------------
-;Params:        [RDL] - number to translate.
+;Params:        [DL] - number to translate.
 ;--------------------------------------------------------------------
-;Returns;       [RDH] - first(higher) character
-;               [RDL] - second(lower) character
+;Returns;       [R8] - first(higher) character adress
+;               [R9] - second(lower) character adress
 ;--------------------------------------------------------------------
-;Destroy:       [RAL]
+;Destroy:       [RAX]
 ;====================================================================
 
-ByteToHex:       
-                mov ral, rdl                            ; save entry          
+ByteToHex:      
+                xor rax, rax 
+                mov al, dl                              ; save entry          
 
-                shr ral, 8                              ; take first character
-                add ral, HEXdict
-                mov rdh, ral                            ; prepare ASCII character for return
+                shr al, 4                               ; take first character
+                add rax, HEXstr
+                mov r8, rax                             ; prepare first ASCII character for return
 
-                mov ral, rdl                            ; take second character
-                shl ral, 24
-                shr ral, 24
-                add ral, HEXdict
-                mov rdl, ral                            ; prepare second character for return
+                xor rax, rax
+                mov al, dl                              ; take second character
+                shl al, 4
+                shr al, 4
+                add rax, HEXstr
+                mov r9, rax                             ; prepare second character for return
 
                 ret
 
 section .data
 
-HEXdict: db "0123456789ABCDE"
+HEXstr: db "0123456789ABCDEF"
