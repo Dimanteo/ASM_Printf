@@ -5,24 +5,18 @@ section .text
 global _start
 
 _start:         
-                mov dl, 0x1a
+                push 0x1A4
                 call ByteToHex
                 mov rax, 0x01                           ; write
                 mov rdi, 1                              ; stdout
-                mov rsi, r8
-                mov rdx, 1                              ; rdx = strlen(rsi)
-                syscall
-                mov rsi, r9
+                mov rdx, 16                             ; rdx = strlen(rsi)
                 syscall
 
-                mov dl, 0xF0
+                mov rax, 0x123456789ABCDEF0
+                push rax
                 call ByteToHex
-                mov rax, 0x01                           ; write
-                mov rdi, 1                              ; stdout
-                mov rsi, r8
-                mov rdx, 1                              ; rdx = strlen(rsi)
-                syscall
-                mov rsi, r9
+                mov rax, 0x01
+                mov rdx, 16
                 syscall
 
                 mov rax, 0x3C                           ;exit(rdi)
@@ -31,33 +25,43 @@ _start:
 
 
 ;====================================================================
-;Translates byte into its ASCII HEX interpretation.
+;Translates number into its ASCII HEX interpretation.
 ;--------------------------------------------------------------------
-;Params:        [DL] - number to translate.
+;Params:        [RBP + 16] - number to translate.
 ;--------------------------------------------------------------------
-;Returns;       [R8] - first(higher) character adress
-;               [R9] - second(lower) character adress
+;Returns;       [RSI] - adress of string, containing translated number
 ;--------------------------------------------------------------------
-;Destroy:       [RAX]
+;Destroy:       [RAX], [RBX], [RCX], [RDX]
 ;====================================================================
 
 ByteToHex:      
-                xor rax, rax 
-                mov al, dl                              ; save entry          
+                push rbp
+                mov rbp, rsp
+                std
+                
+                mov rcx, 16                              ; number of symbols                
+                mov rax, [rbp + 16]                      ; stack dump: rbp_old[rbp] <- call_adr[rbp+8] <- args[rbp+16] 
 
-                shr al, 4                               ; take first character
-                add rax, HEXstr
-                mov r8, rax                             ; prepare first ASCII character for return
+Next:           mov rdx, 0x0F                            ; set up mask
+                and dl, al                               ; take current byte
+                
+                add rdx, HEXstr                          ; generate ASCII code
 
-                xor rax, rax
-                mov al, dl                              ; take second character
-                shl al, 4
-                shr al, 4
-                add rax, HEXstr
-                mov r9, rax                             ; prepare second character for return
+                mov rbx, OutputBuffer                    ; calculate symbol buffer offset                        
+                add rbx, rcx
+                dec rbx
+                mov dl, [rdx]
+                mov [rbx], dl
 
+                shr rax, 4
+                loop Next
+
+                mov rsi, OutputBuffer
+
+                pop rbp
                 ret
 
 section .data
 
 HEXstr: db "0123456789ABCDEF"
+OutputBuffer: db "PPPPPPPPPPPPPPPPPPPPPPP"
