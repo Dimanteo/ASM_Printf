@@ -6,20 +6,58 @@ global _start
 
                 os_write        equ 1
                 stdout          equ 1
+                LF              equ 10
+                HEXlen          equ 16
+                OCTlen          equ 21
+                DEClen          equ 16
+                BINlen          equ 64
+                mask_1          equ 1
+                mask_111        equ 0x7
+                mask_1111       equ 0xF
 
+;============================================================================
+;Description:   Print char.
+;============================================================================
+
+%macro          putc 1
+
+                mov rax, os_write
+                mov rdi, stdout
+                mov rdx, 1
+                mov rsi, $ + 12                 ;muahahahah
+                jmp $ + 3
+                db %1
+                syscall
+
+                %endmacro
+
+;------------------------------Main------------------------------------------
 _start:         
-                push 0x7
+                push 10
+
                 call toBin
-                mov rdx, 64
+                mov rcx, BINlen
                 call writeNums
+
+                putc LF
 
                 call toOct
-                mov rdx, 21
+                mov rcx, OCTlen
                 call writeNums
 
+                putc LF
+
                 call toHex
-                mov rdx, 16
+                mov rcx, HEXlen
                 call writeNums
+
+                putc LF
+
+                call toDec
+                mov rcx, DEClen
+                call writeNums
+
+                putc LF
 
                 mov rax, 0x3C                           ; exit(rdi)
                 xor rdi, rdi
@@ -55,13 +93,8 @@ _start:
 .Next:          mov rdx, %3                             ; set up mask, to take one last digit
                 and dl, al                              ; take current digit
                 
-                add rdx, HEXstr                         ; generate ASCII code
-
-                mov rbx, OutputBuffer                   ; calculate symbol buffer offset                        
-                add rbx, rcx
-                dec rbx
-                mov dl, [rdx]
-                mov [rbx], dl
+                mov dl, [rdx + ASCIIstr]                ; generate ASCII
+                mov [OutputBuffer + rcx - 1], dl        ; mov ASCII to buffer
 
                 shr rax, %4
                 loop .Next
@@ -73,39 +106,72 @@ _start:
                 %endmacro
 
 
-translationTemplate toBin, 64, 0x1, 1                   ; translation to BIN
-translationTemplate toOct, 21, 0x7, 3                   ; translation to OCT
-translationTemplate toHex, 16, 0xF, 4                   ; translation to HEX
+translationTemplate toBin, BINlen, mask_1   , 1         ; translation to BIN
+translationTemplate toOct, OCTlen, mask_111 , 3         ; translation to OCT
+translationTemplate toHex, HEXlen, mask_1111, 4         ; translation to HEX
 
 ;============================================================================
 ;Description: Write string of nums to stdout. Cuts leading zeroes.
 ;----------------------------------------------------------------------------
 ;Params:        [RSI]           - string adress
-;               [RDX]           - string length
+;               [RCX]           - string length
 ;----------------------------------------------------------------------------
 ;Returns:       [RDX]           - output length
 ;               [RSI]           - output adress, without leading zeroes
 ;----------------------------------------------------------------------------
-;Destroy:       [RDX], [RAX], [RDI], [RSI]
+;Destroy:       [RCX], [RAX], [RDI]
 ;============================================================================                
 
 writeNums:
-                std
+                cld
                 mov al, '0'
+                mov rdi, OutputBuffer
 
-.Next:          cmp [rsi], al                           ; skip '0'
-                jne .Break
-                inc rsi
-                dec rdx
-                jmp .Next
+                repe scasb                              ; skip leading '0'
 
-.Break:         mov rax, os_write                       ; setup write syscall
+                dec rdi
+                inc cx
+
+                mov rsi, rdi
+                mov rdx, rcx
+                
+                mov rax, os_write                       ; setup write syscall
                 mov rdi, stdout
                 syscall
 
                 ret
 
+;============================================================================
+;Description:   Do number to decimal translation.
+;----------------------------------------------------------------------------
+;Params:        [RBP + 16]      - number to translate.
+;----------------------------------------------------------------------------
+;Returns:       [RSI]           - adress of string, containing translated number.
+;----------------------------------------------------------------------------
+;Destroy:       [RAX], [RCX], [RDX]
+;============================================================================
+
+toDec:
+                push rbp
+                mov rbp, rsp
+
+                mov rax, [rbp + 16]
+                mov rsi, 10                             ;number system base
+                mov rcx, DEClen
+
+.Next           xor rdx, rdx
+                div rsi
+                mov dl, [ASCIIstr + rdx]                ; generate ASCII
+                mov [OutputBuffer + rcx - 1], dl        ; mov ASCII to buffer
+                loop .Next
+
+                mov rsi, OutputBuffer
+
+                pop rbp
+                ret
+
+
 section .data
 
-HEXstr: db "0123456789ABCDEF"
+ASCIIstr: db "0123456789ABCDEF"
 OutputBuffer: times 64 db 0
