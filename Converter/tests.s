@@ -10,35 +10,35 @@ global _start
                 
                 push %1
 
-                putc '{'
+                PUTC '{'
 
                 call toBin
                 mov rcx, BINlen
                 call writeNums
 
-                putc ','
-                putc ' '
+                PUTC ','
+                PUTC ' '
 
                 call toOct
                 mov rcx, OCTlen
                 call writeNums
 
-                putc ','
-                putc ' '
+                PUTC ','
+                PUTC ' '
 
                 call toHex
                 mov rcx, HEXlen
                 call writeNums
 
-                putc ','
-                putc ' '
+                PUTC ','
+                PUTC ' '
 
                 call toDec
                 mov rcx, DEClen
                 call writeNums
 
-                putc '}'
-                putc LF
+                PUTC '}'
+                PUTC LF
 
                 %endmacro
 
@@ -55,4 +55,4 @@ _start:
                                                         ; 462D53C8ABAC0, -||-}
                 test_series rax
 
-                exit 0
+                EXIT 0

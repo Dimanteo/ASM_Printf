@@ -6,12 +6,6 @@ section .text
 
 global _start
 
-_start: 
-                push Str
-                call puts
-
-                exit 0
-
 
 ;============================================================================
 ;Description:   Prints char.
@@ -28,7 +22,7 @@ putc:
                 add rsi, 8              ; rdi = rsp + 8, adress of char
                 mov rdx, 1
 
-                int_write
+                INT_WRITE
 
                 ret
 
@@ -59,7 +53,7 @@ puts:
 
                 mov rsi, [rsp + 8]
                 
-                int_write
+                INT_WRITE
 
                 ret
 

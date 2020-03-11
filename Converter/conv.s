@@ -72,9 +72,7 @@ writeNums:
                 mov rsi, rdi
                 mov rdx, rcx
                 
-                mov rax, os_write                       ; setup write syscall
-                mov rdi, stdout
-                syscall
+                INT_WRITE
 
                 ret
 

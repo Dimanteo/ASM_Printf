@@ -17,7 +17,7 @@ section .text
 ;Description:   Print char.
 ;============================================================================
 
-%macro          putc 1
+%macro          PUTC 1
 
                 mov rax, os_write
                 mov rdi, stdout
@@ -38,7 +38,7 @@ section .text
 ;Destroy:       [RAX], [RDI]
 ;============================================================================
 
-%macro          int_write 0
+%macro          INT_WRITE 0
 
                 mov rax, os_write
                 mov rdi, stdout
@@ -54,7 +54,7 @@ section .text
 ;Destroy:       [RAX], [RDI]
 ;============================================================================
 
-%macro          exit 1
+%macro          EXIT 1
 
                 mov rax, 0x3C                           ; exit(rdi)
                 mov rdi, %1
