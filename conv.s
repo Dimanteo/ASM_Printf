@@ -2,14 +2,12 @@
 
 section .text
 
-global _start
-
                 os_write        equ 1
                 stdout          equ 1
                 LF              equ 10
                 HEXlen          equ 16
                 OCTlen          equ 21
-                DEClen          equ 16
+                DEClen          equ 20
                 BINlen          equ 64
                 mask_1          equ 1
                 mask_111        equ 0x7
@@ -30,38 +28,6 @@ global _start
                 syscall
 
                 %endmacro
-
-;------------------------------Main------------------------------------------
-_start:         
-                push 10
-
-                call toBin
-                mov rcx, BINlen
-                call writeNums
-
-                putc LF
-
-                call toOct
-                mov rcx, OCTlen
-                call writeNums
-
-                putc LF
-
-                call toHex
-                mov rcx, HEXlen
-                call writeNums
-
-                putc LF
-
-                call toDec
-                mov rcx, DEClen
-                call writeNums
-
-                putc LF
-
-                mov rax, 0x3C                           ; exit(rdi)
-                xor rdi, rdi
-                syscall
 
 
 ;====================================================================

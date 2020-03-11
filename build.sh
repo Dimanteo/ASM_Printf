@@ -1,4 +1,4 @@
 #!/bin/bash
-nasm -f elf64 -l conv.lst conv.s
-ld -s -o conv.elf conv.o
-./conv.elf
+nasm -f elf64 -l tests.lst tests.s
+ld -s -o tests.elf tests.o
+./tests.elf
