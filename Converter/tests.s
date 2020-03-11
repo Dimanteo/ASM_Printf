@@ -55,6 +55,4 @@ _start:
                                                         ; 462D53C8ABAC0, -||-}
                 test_series rax
 
-                mov rax, 0x3C                           ; exit(rdi)
-                xor rdi, rdi
-                syscall
+                exit 0
