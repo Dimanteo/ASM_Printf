@@ -24,7 +24,7 @@ section .text
 %1:             std
                 
                 mov rcx, %2                             ; number of symbols                
-                mov rax, [rsp + 8]                     ; stack dump: rbp_old[rbp] <- call_adr[rbp+8] <- args[rbp+16] 
+                mov rax, [rsp + 8]                      ; stack dump: rbp_old[rbp] <- call_adr[rbp+8] <- args[rbp+16] 
 
 .Next:          mov rdx, %3                             ; set up mask, to take one last digit
                 and dl, al                              ; take current digit

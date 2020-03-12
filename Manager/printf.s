@@ -7,7 +7,7 @@ section .text
 %include        "../Converter/conv.s"
              
 
-%macro          caseNumber 4
+%macro          caseNumber 5
 
 .%1:            cmp bl, %2
                 jne .%3
@@ -16,12 +16,16 @@ section .text
                 push rbx
                 push rcx
                 push rdx
+                push rdi
 
                 mov r8, [rax]
                 push r8
-                call %4
+                call %4                         ; translate
+                mov rcx, %5
+                call writeNums                  ; wiret result on the screen
                 pop r8
                 
+                pop rdi
                 pop rdx                         ; load registers
                 pop rcx
                 pop rbx
@@ -69,10 +73,14 @@ printf:
 .Symb:          cmp bl, 0
                 je .Break
 
-                push rdi                        ; save register value 
+                push rdi                        ; save registers
+                push rax
+
                 push bx                         ; putc(bx)
                 call putc
                 pop bx                          ; balance stack
+
+                pop rax                         ; load registers
                 pop rdi
 
                 inc rdi
@@ -146,13 +154,13 @@ insert:
                 inc rdi
                 ret   
 
-                caseNumber b, 'b', o, toBin             ; case %b
+                caseNumber b, 'b', o,    toBin, BINlen          ; case %b
 
-                caseNumber o, 'o', d, toOct             ; case %o
+                caseNumber o, 'o', d,    toOct, OCTlen          ; case %o
 
-                caseNumber d, 'd', x, toDec             ; case %d
+                caseNumber d, 'd', x,    toDec, DEClen          ; case %d
 
-                caseNumber x, 'x', Percent, toHex       ; case %x
+                caseNumber x, 'x', Quit, toHex, HEXlen          ; case %x
 
 
 .Percent:       push rsi                        ; save registers
@@ -169,6 +177,6 @@ insert:
                 pop rax
                 pop rsi
 
-                inc rdi
+.Quit           inc rdi
                 ret                
 

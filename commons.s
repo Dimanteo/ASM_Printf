@@ -21,6 +21,7 @@ section .text
 
 %macro          PUTC 1
 
+                nop
                 mov rax, os_write
                 mov rdi, stdout
                 mov rdx, 1
@@ -28,6 +29,7 @@ section .text
                 jmp $ + 3
                 db %1
                 syscall
+                nop
 
                 %endmacro
 
