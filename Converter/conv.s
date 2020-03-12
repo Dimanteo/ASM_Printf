@@ -2,8 +2,6 @@
 
 section .text
 
-%include        "../commons.s"
-
 ;====================================================================
 ;Description: Generate function for translation
 ;             from number to ASCII interpretation.

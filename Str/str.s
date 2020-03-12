@@ -2,8 +2,6 @@
 
 section .text
 
-%include        "../commons.s"
-
 global _start
 
 

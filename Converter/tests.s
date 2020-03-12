@@ -4,6 +4,7 @@ section .text
 
 global _start
 
+%include        "commons.s"
 %include        "conv.s"
 
 %macro          test_series 1                   ;output %1 -> {BIN, OCT, HEX, DEC}

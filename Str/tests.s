@@ -2,6 +2,7 @@
 
 section .text
 
+%include        "commons.s"
 %include        "str.s"
 
 global _start
