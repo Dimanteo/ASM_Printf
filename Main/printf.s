@@ -31,6 +31,7 @@ section .text
                 pop rbx
                 pop rax
                 
+                add rax, 8                     ; move to next argument
                 inc rdi
                 ret    
 
@@ -48,7 +49,7 @@ global _start
 ;----------------------------------------------------------------------------
 ;Returns:
 ;----------------------------------------------------------------------------
-;Destroy:
+;Destroy:       [R8], [RAX], [RBX], [RCX], [RSI], [RDI] 
 ;============================================================================ 
 
 printf:         
@@ -65,8 +66,6 @@ printf:
                 jne .Symb
 
                 call insert
-
-                add rax, 8                     ; move to next argument
 
                 jmp .Next
 
@@ -127,6 +126,7 @@ insert:
                 pop rax
                 pop rsi
 
+                add rax, 8                     ; move to next argument
                 inc rdi
                 ret
 
@@ -151,6 +151,7 @@ insert:
                 pop rdi
                 pop rsi
 
+                add rax, 8                     ; move to next argument
                 inc rdi
                 ret   
 

@@ -6,7 +6,7 @@ section .text
 
 global _start
 
-_start:
+_start:                
                 push str
                 call printf
                 PUTC LF
@@ -39,6 +39,9 @@ _start:
                 pop r8
                 PUTC LF
 
+                push 127
+                push '!'
+                push 100
                 push 0xEDA
                 push ' '
                 push str_love
@@ -63,6 +66,6 @@ str_hex:        db "%x Hex %x %x", 0
 str_dec:        db "%d Dec %d %d", 0
 str_oct:        db "%o Oct %o %o", 0
 str_bin:        db "%b Bin %b %b", 0
-str_killer:     db "%c%c%s%c%x", 0
+str_killer:     db "%c%c%s%c%x %d%%%c%b", 0
 str_love:       db "love", 0
 str_finally:    db "A ya vse otdebugal%c%c", 0
